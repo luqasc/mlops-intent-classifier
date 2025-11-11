@@ -36,9 +36,17 @@ jobs:
           python -m pip install --upgrade pip
           # Instala dependências de produção
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -e .
 
       # 4. Executa os testes com pytest (com o report -rA)
       - name: Rodar testes com pytest
+        env:
+          # Mapeia os secrets do GitHub para as variáveis de ambiente
+          # que o seu código espera
+          MONGO_URI: ${{ secrets.MONGO_URI_TEST }}
+          MONGO_DB: ${{ secrets.MONGO_DB_TEST }}
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+          ENV: dev # Define o ambiente para 'dev' para pular a autenticação
         run: python -m pytest -rA
 
       # 7. Constroi a imagem Docker para validar o Dockerfile
